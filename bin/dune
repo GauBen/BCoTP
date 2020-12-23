@@ -1,0 +1,4 @@
+(executable
+ (public_name bcotp)
+ (name main)
+ (libraries bcotp graphics unix))

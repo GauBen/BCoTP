@@ -1,2 +1,0 @@
-BigCitiesOnTinyPlanets:
-	php compile.php
