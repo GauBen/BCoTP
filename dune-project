@@ -21,6 +21,6 @@
  (name bcotp)
  (synopsis "Big Cities on Tiny Planets : Definitive Edition")
  (description "The locally world-famous city building game")
- (depends graphics unix))
+ (depends graphics))
 
 (generate_opam_files true)
