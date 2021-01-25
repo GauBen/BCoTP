@@ -24,10 +24,7 @@ jobs:
 
       - name: Install XQuartz to macOS
         if: runner.os == 'macOS'
-        run: |
-          wget https://dl.bintray.com/xquartz/downloads/XQuartz-2.7.11.dmg
-          sudo hdiutil attach XQuartz-2.7.11.dmg
-          sudo installer -package /Volumes/XQuartz-2.7.11/XQuartz.pkg -target /
+        run: brew cask install xquartz
 
       - name: Use OCaml ${{ matrix.ocaml-version }}
         uses: avsm/setup-ocaml@v1
@@ -36,12 +33,7 @@ jobs:
 
       - name: Patch Graphics on Windows
         if: runner.os == 'Windows'
-        run: |
-          git clone --depth 1 --branch win32-safe-string https://github.com/dra27/graphics.git
-          cd graphics
-          opam pin add graphics . --no-action
-          opam install .
-          cd ..
+        run: opam pin add graphics git+https://github.com/ocaml/graphics
 
       - run: opam pin add bcotp.dev . --no-action
 
