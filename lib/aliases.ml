@@ -16,8 +16,6 @@ let sx = Graphics.size_x
 
 and sy = Graphics.size_y
 
-let time = Sys.time
-
 let get arr n = arr.((n mod len arr) + if n < 0 then len arr else 0)
 
 let modpos a b = (a mod b) + if a < 0 then b else 0
