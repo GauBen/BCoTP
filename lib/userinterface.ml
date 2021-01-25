@@ -155,8 +155,8 @@ module Pixels = struct
 
   let hud_margin width scale =
     (width / 2)
-    - ( resource_panel_width scale + info_panel_width scale
-      + building_panel_width scale + 2 )
+    - (resource_panel_width scale + info_panel_width scale
+     + building_panel_width scale + 2)
       / 2
 end
 
@@ -185,9 +185,9 @@ module Calculations = struct
     let x =
       iof
         (floor
-           ( ui.scene.cameraX
+           (ui.scene.cameraX
            +. foi ((2 * mx) - scene'.sizes.x)
-              /. (2. *. foi (Pixels.per_block ui)) ))
+              /. (2. *. foi (Pixels.per_block ui))))
     in
     let curvation = curve scene' ui mx in
     {
@@ -304,8 +304,8 @@ module Draw = struct
     try Graphics.fill_rect x y width height
     with Invalid_argument _ ->
       print_string
-        ( string_of_int x ^ " " ^ string_of_int y ^ " " ^ string_of_int width
-        ^ " " ^ string_of_int height ^ "\n" );
+        (string_of_int x ^ " " ^ string_of_int y ^ " " ^ string_of_int width
+       ^ " " ^ string_of_int height ^ "\n");
       flush stdout
 
   let _fill_rect_game_fixed scene' _ { x; y } =
@@ -328,7 +328,7 @@ module Draw = struct
               x = x + (j * scale);
               y = y + ((ly - i) * scale) + curve (x + (j * scale));
             }
-            { x = scale; y = scale } )
+            { x = scale; y = scale })
       done
     done
 
@@ -359,9 +359,9 @@ module Draw = struct
     String.iteri
       (fun i c ->
         _draw_digit ui (ord c - 48) { x = x + margin (i + offset + sign); y })
-      ( match pad with
+      (match pad with
       | None -> s
-      | Some c -> String.make (rightAligned - l) c ^ s )
+      | Some c -> String.make (rightAligned - l) c ^ s)
 
   let draw_padded_number ui n l { x; y } =
     draw_number ui n { x; y } (false, l, None)
@@ -387,8 +387,8 @@ module Draw = struct
           iof ((foi scene'.sizes.x /. 2.) -. (ui.scene.cameraX *. foi gc))
           + (x * gc);
         y =
-          ( Pixels.surface ui
-          + (ui.scene.scene_scale * if overground then 0 else -len bitmap) );
+          (Pixels.surface ui
+          + (ui.scene.scene_scale * if overground then 0 else -len bitmap));
       }
 
   let _draw_overground scene' ui shade gif x =
@@ -398,9 +398,9 @@ module Draw = struct
     _draw_gif scene' ui shade gif { x; overground = false }
 
   let _draw_shaded_block scene' ui (top, bottom) (block : Resources.block) x =
-    ( match block with
+    (match block with
     | { overground = Some gif; _ } -> _draw_overground scene' ui top gif x
-    | _ -> () );
+    | _ -> ());
     match block with
     | { underground = Some gif; _ } -> _draw_underground scene' ui bottom gif x
     | _ -> ()
@@ -572,7 +572,7 @@ module Draw = struct
                 y + y2 )
           in
           colon 2;
-          colon 5 )
+          colon 5)
         else (
           draw (Game2Resources.icon p.name) (2 * ui.hud.scale, y + y2);
           draw_padded_signed_number ui
@@ -586,12 +586,12 @@ module Draw = struct
           draw Resources.Font.min
             ( (4 + (Resources.Font.x * 5) + 3 + 2 + Resources.Font.y + 2)
               * ui.hud.scale,
-              y + y2 ) ))
+              y + y2 )))
       ui.city.production
 
   let draw_hud_resources element ui =
-    ( if ui.hud.showProduction then _draw_hud_production
-    else _draw_hud_availableRes )
+    (if ui.hud.showProduction then _draw_hud_production
+    else _draw_hud_availableRes)
       element ui
 
   let draw_hud_buildings element _ =
@@ -633,7 +633,7 @@ module Draw = struct
                       x = x + ((4 + Resources.Font.y) * ui.hud.scale);
                       y = y + y2 !i;
                     };
-                  incr i ))
+                  incr i))
               wS.initialResources;
             List.iter
               (fun (p : Game.resource) ->
@@ -660,13 +660,13 @@ module Draw = struct
                   {
                     x =
                       x
-                      + ( 4 + (Resources.Font.x * 5) + 3 + 2 + Resources.Font.y
-                        + 2 )
+                      + (4 + (Resources.Font.x * 5) + 3 + 2 + Resources.Font.y
+                       + 2)
                         * ui.hud.scale;
                     y = y + y2 !i;
                   };
                 incr i)
-              wS.production )
+              wS.production)
           else
             List.iter
               (fun (initialResource : Game.resource) ->
@@ -702,9 +702,9 @@ module Draw = struct
                           * ui.hud.scale;
                       y = y + y2 !i;
                     };
-                  incr i ))
+                  incr i))
               wS.availableResources)
-        ui.city.interactions.selection )
+        ui.city.interactions.selection)
 
   let draw_hud _ _ = ()
 
@@ -712,59 +712,59 @@ module Draw = struct
   let draw_delete_button button' ui =
     if Game.Interactions.show_delete_button ui.city then (
       draw_bitmap
-        ( match
-            (button' == ui.hoveredElement, Game.Interactions.can_delete ui.city)
-          with
+        (match
+           (button' == ui.hoveredElement, Game.Interactions.can_delete ui.city)
+         with
         | _, false -> Resources.SmallButtons.backgroundDisabled
         | true, _ -> Resources.SmallButtons.backgroundActive
-        | _ -> Resources.SmallButtons.background )
+        | _ -> Resources.SmallButtons.background)
         button'.position ui.hud.scale;
-      draw_bitmap Resources.SmallButtons.delete button'.position ui.hud.scale )
+      draw_bitmap Resources.SmallButtons.delete button'.position ui.hud.scale)
 
   let draw_up_button button' ui =
     if Game.Interactions.show_up_button ui.city then (
       draw_bitmap
-        ( match
-            (button' == ui.hoveredElement, Game.Interactions.can_up ui.city)
-          with
+        (match
+           (button' == ui.hoveredElement, Game.Interactions.can_up ui.city)
+         with
         | _, false -> Resources.SmallButtons.backgroundDisabled
         | true, _ -> Resources.SmallButtons.backgroundActive
-        | _ -> Resources.SmallButtons.background )
+        | _ -> Resources.SmallButtons.background)
         button'.position ui.hud.scale;
       draw_bitmap
-        ( if Game.Interactions.show_move_button ui.city then
-          Resources.SmallButtons.left
-        else Resources.SmallButtons.up )
-        button'.position ui.hud.scale )
+        (if Game.Interactions.show_move_button ui.city then
+         Resources.SmallButtons.left
+        else Resources.SmallButtons.up)
+        button'.position ui.hud.scale)
 
   let draw_down_button button' ui =
     if Game.Interactions.show_down_button ui.city then (
       draw_bitmap
-        ( match
-            (button' == ui.hoveredElement, Game.Interactions.can_down ui.city)
-          with
+        (match
+           (button' == ui.hoveredElement, Game.Interactions.can_down ui.city)
+         with
         | _, false -> Resources.SmallButtons.backgroundDisabled
         | true, _ -> Resources.SmallButtons.backgroundActive
-        | _ -> Resources.SmallButtons.background )
+        | _ -> Resources.SmallButtons.background)
         button'.position ui.hud.scale;
       draw_bitmap
-        ( if Game.Interactions.show_move_button ui.city then
-          Resources.SmallButtons.right
-        else Resources.SmallButtons.down )
-        button'.position ui.hud.scale )
+        (if Game.Interactions.show_move_button ui.city then
+         Resources.SmallButtons.right
+        else Resources.SmallButtons.down)
+        button'.position ui.hud.scale)
 
   let draw_building_button s button' ui =
     draw_bitmap
-      ( match
-          ( ui.city.interactions.toBeBuilt,
-            button' == ui.hoveredElement,
-            Game.Interactions.can_buy ui.city s )
-        with
+      (match
+         ( ui.city.interactions.toBeBuilt,
+           button' == ui.hoveredElement,
+           Game.Interactions.can_buy ui.city s )
+       with
       | _, _, false -> Resources.Buttons.backgroundDisabled
       | Some a, true, _ when a = s -> Resources.Buttons.backgroundHovered
       | Some a, _, _ when a = s -> Resources.Buttons.backgroundFocused
       | _, true, _ -> Resources.Buttons.backgroundActive
-      | _ -> Resources.Buttons.background )
+      | _ -> Resources.Buttons.background)
       button'.position ui.hud.scale;
     draw_bitmap (Game2Resources.button s) button'.position ui.hud.scale
 
@@ -868,7 +868,7 @@ module EventHandlers = struct
           }
         in
         ui.hud.infoTip <- Some infoTip';
-        ui.hud.element.children <- infoTip' :: ui.hud.element.children )
+        ui.hud.element.children <- infoTip' :: ui.hud.element.children)
 
   let delete_button_move _ ui =
     match ui.hud.infoTip with
@@ -914,7 +914,7 @@ module EventHandlers = struct
           }
         in
         ui.hud.infoTip <- Some infoTip';
-        ui.hud.element.children <- infoTip' :: ui.hud.element.children )
+        ui.hud.element.children <- infoTip' :: ui.hud.element.children)
 
   let down_button_over _ ui =
     if
@@ -943,7 +943,7 @@ module EventHandlers = struct
           }
         in
         ui.hud.infoTip <- Some infoTip';
-        ui.hud.element.children <- infoTip' :: ui.hud.element.children )
+        ui.hud.element.children <- infoTip' :: ui.hud.element.children)
 
   let up_button_move button' ui = delete_button_move button' ui
 
@@ -1023,9 +1023,9 @@ module Elements = struct
             + ((3 + ((Resources.Widths.button + 2) * x)) * hud.scale);
           y =
             hudBuildings.position.y
-            + ( 3
+            + (3
               + (Resources.Widths.button + 2)
-                * (Layout.buildingPanelRows - y - 1) )
+                * (Layout.buildingPanelRows - y - 1))
               * hud.scale;
         };
       sizes =
@@ -1372,12 +1372,12 @@ let new_ui city =
 
 let update refUi =
   let ui = !refUi in
-  ( if
-    ui.screen.screen_element.sizes.x <> sx ()
-    || ui.screen.screen_element.sizes.y <> sy ()
+  (if
+   ui.screen.screen_element.sizes.x <> sx ()
+   || ui.screen.screen_element.sizes.y <> sy ()
   then
-    let ui = !(new_ui ui.city) in
-    refUi := ui );
+   let ui = !(new_ui ui.city) in
+   refUi := ui);
   Events.mouse ui;
   if ui.mouse.position.x = 0 then ui.scene.cameraX <- ui.scene.cameraX -. 0.2;
   if ui.mouse.position.x = ui.screen.screen_element.sizes.x - 1 then
@@ -1410,5 +1410,5 @@ let draw refUi =
   then (
     Graphics.moveto 10 10;
     Graphics.set_color Resources.palette.(1);
-    Graphics.draw_string "Fenetre trop petite / Ouvrir en 800x600" )
+    Graphics.draw_string "Fenetre trop petite / Ouvrir en 800x600")
   else Draw.draw_element ui ui.screen.screen_element
