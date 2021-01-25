@@ -1,4 +1,5 @@
 open Bcotp
+open Aliases
 
 (* Nouvelle partie *)
 let game = Game.new_game ()
@@ -8,8 +9,6 @@ let () =
   Graphics.set_window_title "Big Cities on Tiny Planets"
 
 let ui = Userinterface.new_ui game.cities.(0)
-
-let time = Unix.gettimeofday
 
 let t = ref (time ())
 

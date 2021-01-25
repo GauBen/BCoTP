@@ -27,3 +27,5 @@ let modfl a b =
 let is_between a n b m =
   (* a <= n <= b [mod m] ? *)
   (a <= n && n <= b) || (a - m <= n && n <= b - m) || (a + m <= n && n <= b + m)
+
+let time = Unix.gettimeofday
