@@ -782,9 +782,9 @@ module City = struct
       (List.map
          (fun prod ->
            (if opposite then -1. else 1.)
-           *. ( ( if prod.amount < 0. <> opposite then 0.
-                else Calculations.get_resource city.storage prod.name )
-              -. Calculations.get_resource availableResources prod.name )
+           *. ((if prod.amount < 0. <> opposite then 0.
+               else Calculations.get_resource city.storage prod.name)
+              -. Calculations.get_resource availableResources prod.name)
            /. prod.amount)
          production)
 
@@ -809,7 +809,7 @@ module City = struct
             List.find_all
               (fun s -> s.coords.overground = overground)
               (get city.cells x).ground;
-          ] )
+          ])
 
   (* Calcul de la production d'un bâtiment *)
   let update_worldStructure city (wS : worldStructure) time =
@@ -855,8 +855,8 @@ module City = struct
                   })
                 produced;
             wS.production <-
-              ( if wS.working then prod
-              else List.map (fun r -> { name = r.name; amount = 0. }) prod );
+              (if wS.working then prod
+              else List.map (fun r -> { name = r.name; amount = 0. }) prod);
             { production = wS.production; produced }
         | _ ->
             wS.working <- false;
@@ -864,7 +864,7 @@ module City = struct
               production =
                 List.map (fun r -> { name = r.name; amount = 0. }) prod;
               produced = [];
-            } )
+            })
     | i when i = Structures.crops -> (
         let wSo = find_worldStructure city Structures.field wS.coords.x [ 0 ] in
         match wSo with
@@ -891,8 +891,8 @@ module City = struct
                 };
               ];
             wS.production <-
-              ( if wS.working then prod
-              else List.map (fun r -> { name = r.name; amount = 0. }) prod );
+              (if wS.working then prod
+              else List.map (fun r -> { name = r.name; amount = 0. }) prod);
             { production = wS.production; produced }
         | _ ->
             wS.working <- false;
@@ -900,7 +900,7 @@ module City = struct
               production =
                 List.map (fun r -> { name = r.name; amount = 0. }) prod;
               produced = [];
-            } )
+            })
     | i when i = Structures.minerCamp -> (
         let wSo = find_worldStructure city Structures.seam wS.coords.x [ 0 ] in
         let prodSand =
@@ -923,9 +923,9 @@ module City = struct
               prodSand
         in
         wS.production <-
-          ( if dtS = 0. then
-            List.map (fun r -> { name = r.name; amount = 0. }) prodSand
-          else prodSand );
+          (if dtS = 0. then
+           List.map (fun r -> { name = r.name; amount = 0. }) prodSand
+          else prodSand);
         match wSo with
         | Some seam ->
             let prodMetal =
@@ -963,16 +963,15 @@ module City = struct
               List.concat
                 [
                   wS.production;
-                  ( if not (dtM = 0.) then prodMetal
+                  (if not (dtM = 0.) then prodMetal
                   else
-                    List.map (fun r -> { name = r.name; amount = 0. }) prodMetal
-                  );
+                    List.map (fun r -> { name = r.name; amount = 0. }) prodMetal);
                 ];
             {
               production = wS.production;
               produced = List.concat [ producedSand; producedMetal ];
             }
-        | _ -> { production = wS.production; produced = producedSand } )
+        | _ -> { production = wS.production; produced = producedSand })
     | _ ->
         let dt = production_time city prod city.availableResources time false in
         wS.working <- not (dt = 0.);
@@ -984,8 +983,8 @@ module City = struct
               prod
         in
         wS.production <-
-          ( if wS.working then level.production
-          else List.map (fun r -> { name = r.name; amount = 0. }) prod );
+          (if wS.working then level.production
+          else List.map (fun r -> { name = r.name; amount = 0. }) prod);
         { production = wS.production; produced }
 
   let can_build city structure x =
@@ -995,12 +994,12 @@ module City = struct
     let o = structure.overground in
     (* Partie découverte ? *)
     c.explored = Yes
-    && ( (* Biome constructible ? *)
-         c.biome <> Biomes.ocean && c.biome <> Biomes.mountain
-         && structure <> Structures.crops
-         && structure <> Structures.harbor
-         && structure <> Structures.boat
-         && structure <> Structures.tunnel
+    && ((* Biome constructible ? *)
+        c.biome <> Biomes.ocean && c.biome <> Biomes.mountain
+        && structure <> Structures.crops
+        && structure <> Structures.harbor
+        && structure <> Structures.boat
+        && structure <> Structures.tunnel
        || (c.biome = Biomes.plain && structure = Structures.crops)
        || c.biome = Biomes.ocean
           && structure = Structures.harbor
@@ -1008,9 +1007,9 @@ module City = struct
        || c.biome = Biomes.mountain && false
           && (pc.biome <> Biomes.mountain || nc.biome <> Biomes.mountain)
        || (c.biome = Biomes.ocean && structure = Structures.boat)
-       || (c.biome = Biomes.mountain && structure = Structures.tunnel) )
-    && ( structure.width = 1
-       || (nc.biome <> Biomes.mountain && nc.biome <> Biomes.ocean) )
+       || (c.biome = Biomes.mountain && structure = Structures.tunnel))
+    && (structure.width = 1
+       || (nc.biome <> Biomes.mountain && nc.biome <> Biomes.ocean))
     && List.for_all
          (fun a -> a) (* Autres bâtiments qui gênent ? *)
          (List.init structure.width (fun i ->
@@ -1079,12 +1078,12 @@ module City = struct
       (fun i ->
         let cell = get city.cells (x + i) in
         cell.explored <-
-          ( if abs i = range then max Discovered cell.explored
+          (if abs i = range then max Discovered cell.explored
           else if
           (cell.biome = Biomes.mountain && abs i = 1)
           || cell.biome <> Biomes.mountain
-        then Yes
-          else max Discovered cell.explored ))
+         then Yes
+          else max Discovered cell.explored))
       vision
 
   let upgrade city wS =
@@ -1102,7 +1101,7 @@ module City = struct
       wS.storage <- l.storage;
       update_storage city;
       if wS.structure = Structures.rocketStation && wS.level = 2 then
-        you_win city );
+        you_win city);
     if
       wS.structure = Structures.boat
       && can_build city Structures.boat (wS.coords.x - 1)
@@ -1116,7 +1115,7 @@ module City = struct
           x = modpos (wS.coords.x - 1) city.width;
           overground = wS.coords.overground;
         };
-      explore city wS.coords.x )
+      explore city wS.coords.x)
 
   let downgrade city wS =
     if wS.level > 0 then (
@@ -1134,7 +1133,7 @@ module City = struct
       wS.level <- wS.level - 1;
       let l = wS.structure.levels.(wS.level) in
       wS.storage <- l.storage;
-      update_storage city );
+      update_storage city);
     if
       wS.structure = Structures.boat
       && can_build city Structures.boat (wS.coords.x + 1)
@@ -1148,7 +1147,7 @@ module City = struct
           x = modpos (wS.coords.x + 1) city.width;
           overground = wS.coords.overground;
         };
-      explore city wS.coords.x )
+      explore city wS.coords.x)
 
   let build city (structure, level) x =
     if can_buy city (structure, level) && can_build city structure x then (
@@ -1157,13 +1156,13 @@ module City = struct
         Calculations.sum_resources
           [ city.availableResources; l.initialResources ];
       let cell = get city.cells x in
-      ( if structure = Structures.crops then
-        let field = new_worldStructure (Structures.field, 0) x false 0. in
-        cell.ground <- field :: cell.ground );
+      (if structure = Structures.crops then
+       let field = new_worldStructure (Structures.field, 0) x false 0. in
+       cell.ground <- field :: cell.ground);
       cell.ground <-
         new_worldStructure (structure, level) x true 0. :: cell.ground;
       update_storage city;
-      explore city x )
+      explore city x)
 
   let destroy city wS =
     let cell = get city.cells wS.coords.x in
@@ -1184,7 +1183,7 @@ module City = struct
                  (fun r -> r.amount > 0. || r.name = Resources.villagers)
                  wS.initialResources);
           ];
-      update_storage city );
+      update_storage city);
     match city.interactions.toBeBuilt with
     | Some s ->
         city.interactions.possibleCoords <-
@@ -1232,9 +1231,9 @@ module City = struct
           ground = !ground;
           x;
           explored =
-            ( if abs ((width / 2) + 1 - x) >= (width / 2) - 3 then Yes
+            (if abs ((width / 2) + 1 - x) >= (width / 2) - 3 then Yes
             else if abs ((width / 2) + 1 - x) >= (width / 2) - 4 then Discovered
-            else No );
+            else No);
         })
       (Array.init width (fun x ->
            match iof (h x) with
@@ -1280,7 +1279,7 @@ module City = struct
                   [ city.production; update.production ];
               city.availableResources <-
                 Calculations.sum_resources
-                  [ city.availableResources; update.produced ] )
+                  [ city.availableResources; update.produced ])
             else if List.for_all (fun r -> r.amount <= 0.) wS.availableResources
             then destroy city wS;
             if
@@ -1293,9 +1292,9 @@ module City = struct
           cell.ground)
       city.cells;
     city.interactions.toBeBuilt <-
-      ( match city.interactions.toBeBuilt with
+      (match city.interactions.toBeBuilt with
       | Some s when can_buy city (s, 0) -> Some s
-      | _ -> None )
+      | _ -> None)
 end
 
 (* / City *)
@@ -1376,7 +1375,7 @@ module Interactions = struct
   let destroy city =
     if can_delete city then (
       List.iter (fun wS -> City.destroy city wS) city.interactions.selection;
-      city.interactions.selection <- [] )
+      city.interactions.selection <- [])
 
   let earned_on_destroyed city =
     List.map
