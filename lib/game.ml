@@ -111,6 +111,8 @@ module Biomes = struct
   let ocean = 4
 
   let mountain = 8
+
+  let is_flat b = b = plain || b = desert
 end
 
 (* Caractéristiques des structures *)
@@ -1204,30 +1206,61 @@ module City = struct
 
   let oil x w = deposit (Structures.oilDeposit, level x w) x
 
-  let generate_cells width =
-    let pi = acos (-1.) in
-    let w = pi *. 1. /. 40. in
-    let h x = 1.42 +. (0.6 *. sin (foi x /. w)) in
+  let generate_cells seed width =
+    let get_biome x =
+      let w = 1. /. 12. in
+      let h x =
+        let z = (foi x *. w) +. seed in
+        let f z =
+          (3. *. sin (3. *. z))
+          +. (sin z *. cos z /. 2.)
+          +. (3. *. sin (4. *. z) *. cos (10. *. z))
+          +. 2.
+        in
+        min (f z) (f (z +. w)) +. (3. *. f z)
+      in
+      let y = h x in
+      match if y < 0. then 0 else if y > 20. then 2 else 1 with
+      | 0 -> Biomes.ocean
+      | 2 -> Biomes.mountain
+      | _ when x mod 12 >= 8 -> Biomes.desert
+      | _ -> Biomes.plain
+    in
     Array.mapi
       (fun x biome ->
         let ground = ref [] in
-        if biome = Biomes.plain && x mod 10 >= 5 && x mod 10 <= 7 then
+        let biome = ref biome in
+        if x >= width - 2 || (x >= 0 && x <= 4) then
+          if not (Biomes.is_flat !biome) then biome := Biomes.plain;
+        let place_wood x =
+          (not (x >= width - 2 || (x >= 0 && x <= 4)))
+          && (x mod 10 >= 6
+              && x mod 10 <= 9
+              && Biomes.is_flat (get_biome (x - 1))
+              && Biomes.is_flat (get_biome (x + 1))
+             || x mod 10 >= 1
+                && x mod 10 <= 4
+                && Biomes.is_flat (get_biome (x - 1))
+                && Biomes.is_flat (get_biome (x + 1)))
+        in
+        if !biome = Biomes.plain && place_wood x then
           ground := wood x width :: !ground;
-        if biome = Biomes.plain && x mod 4 = 2 then
+        if !biome = Biomes.plain && x mod 4 = 2 then
           ground := water x width :: !ground;
-        if biome = Biomes.plain && x mod 8 = 3 then
+        if !biome = Biomes.plain && x mod 8 = 3 then
           ground := metal x width :: !ground;
-        if biome = Biomes.desert && x mod 3 = 0 then
+        if !biome = Biomes.desert && x mod 3 = 0 then
           ground := metal x width :: !ground;
-        if biome = Biomes.desert && x mod 5 = 0 && x mod 3 <> 0 then
+        if !biome = Biomes.desert && x mod 5 = 0 && x mod 3 <> 0 then
           ground := oil x width :: !ground;
+        if x = width - 2 || x = 4 then ground := wood x width :: !ground;
         if x = 0 then
           ground :=
             new_worldStructure (Structures.cityHall, 0) x true 0. :: !ground;
         if x = 2 then
           ground := new_worldStructure (Structures.well, 0) x true 0. :: !ground;
         {
-          biome;
+          biome = !biome;
           ground = !ground;
           x;
           explored =
@@ -1235,17 +1268,13 @@ module City = struct
             else if abs ((width / 2) + 1 - x) >= (width / 2) - 4 then Discovered
             else No);
         })
-      (Array.init width (fun x ->
-           match iof (h x) with
-           | 0 -> Biomes.ocean
-           | 2 -> Biomes.mountain
-           | _ when x mod 12 >= 8 -> Biomes.desert
-           | _ -> Biomes.plain))
+      (Array.init width get_biome)
 
   let new_city () =
+    let seed = time () in
     {
       width = Defaults.planetWidth;
-      cells = generate_cells Defaults.planetWidth;
+      cells = generate_cells seed Defaults.planetWidth;
       storage =
         Calculations.sum_resources
           [
