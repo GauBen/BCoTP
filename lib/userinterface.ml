@@ -64,9 +64,10 @@ module KeyboardControls = struct
 
   let is_right k = k = 100 || k = 54 (* D et 6 *)
 
-  let is_zoom_in k = k = 43 || k = 61 || k = 105 (* +, = et I *)
+  (* +, =, I, Z et W *)
+  let is_zoom_in k = k = 43 || k = 61 || k = 105 || k = 122 || k = 119
 
-  let is_zoom_out k = k = 45 || k = 111 (* - et O *)
+  let is_zoom_out k = k = 45 || k = 111 || k = 115 (* -, O et S *)
 
   let is_prod k = k = 112 (* P *)
 
