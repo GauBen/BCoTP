@@ -24,7 +24,7 @@ jobs:
 
       - name: Install XQuartz to macOS
         if: runner.os == 'macOS'
-        run: brew cask install xquartz
+        run: brew install --cask xquartz
 
       - name: Use OCaml ${{ matrix.ocaml-version }}
         uses: avsm/setup-ocaml@v1
