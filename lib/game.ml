@@ -1217,48 +1217,63 @@ module City = struct
           +. (3. *. sin (4. *. z) *. cos (10. *. z))
           +. 2.
         in
-        min (f z) (f (z +. w)) +. (3. *. f z)
+        min (f z) (f (z +. w)) *. Float.abs (f z)
       in
       let y = h x in
-      match if y < 0. then 0 else if y > 20. then 2 else 1 with
+      let seeded_x = x + iof seed in
+      match if y < 0. then 0 else if y > 27. then 2 else 1 with
       | 0 -> Biomes.ocean
       | 2 -> Biomes.mountain
-      | _ when x mod 12 >= 8 -> Biomes.desert
+      | _ when seeded_x mod 12 >= 8 -> Biomes.desert
       | _ -> Biomes.plain
     in
     Array.mapi
       (fun x biome ->
         let ground = ref [] in
         let biome = ref biome in
+        let seeded_x = x + iof seed in
         if x >= width - 2 || (x >= 0 && x <= 4) then
           if not (Biomes.is_flat !biome) then biome := Biomes.plain;
+        if (x = 5 || x = 6) && get_biome 7 <> Biomes.ocean then
+          (* On retire le pédiluve *)
+          biome := Biomes.plain;
+        if
+          (x = width - 3 || x = width - 4)
+          && get_biome (width - 5) <> Biomes.ocean
+        then biome := Biomes.desert;
         let place_wood x =
           (not (x >= width - 2 || (x >= 0 && x <= 4)))
-          && (x mod 10 >= 6
-              && x mod 10 <= 9
+          && (seeded_x mod 10 >= 6
+              && seeded_x mod 10 <= 9
               && Biomes.is_flat (get_biome (x - 1))
               && Biomes.is_flat (get_biome (x + 1))
-             || x mod 10 >= 1
-                && x mod 10 <= 4
+             || seeded_x mod 10 >= 1
+                && seeded_x mod 10 <= 4
                 && Biomes.is_flat (get_biome (x - 1))
                 && Biomes.is_flat (get_biome (x + 1)))
         in
-        if !biome = Biomes.plain && place_wood x then
-          ground := wood x width :: !ground;
-        if !biome = Biomes.plain && x mod 4 = 2 then
-          ground := water x width :: !ground;
-        if !biome = Biomes.plain && x mod 8 = 3 then
-          ground := metal x width :: !ground;
-        if !biome = Biomes.desert && x mod 3 = 0 then
-          ground := metal x width :: !ground;
-        if !biome = Biomes.desert && x mod 5 = 0 && x mod 3 <> 0 then
-          ground := oil x width :: !ground;
-        if x = width - 2 || x = 4 then ground := wood x width :: !ground;
         if x = 0 then
           ground :=
-            new_worldStructure (Structures.cityHall, 0) x true 0. :: !ground;
-        if x = 2 then
-          ground := new_worldStructure (Structures.well, 0) x true 0. :: !ground;
+            new_worldStructure (Structures.cityHall, 0) x true 0. :: !ground
+        else if x = 2 then (
+          ground :=
+            new_worldStructure (Structures.well, 0) x true 0.
+            :: water x width :: !ground;
+          biome := Biomes.plain)
+        else if x = width - 2 || x = 4 then (
+          ground := wood x width :: !ground;
+          biome := Biomes.plain)
+        else if x <> 1 then (
+          if !biome = Biomes.plain && place_wood x then
+            ground := wood x width :: !ground;
+          if !biome = Biomes.plain && seeded_x mod 4 = 2 then
+            ground := water x width :: !ground;
+          if !biome = Biomes.plain && seeded_x mod 8 = 3 then
+            ground := metal x width :: !ground;
+          if !biome = Biomes.desert && seeded_x mod 3 = 0 then
+            ground := metal x width :: !ground;
+          if !biome = Biomes.desert && seeded_x mod 5 = 0 && seeded_x mod 3 <> 0
+          then ground := oil x width :: !ground);
         {
           biome = !biome;
           ground = !ground;
