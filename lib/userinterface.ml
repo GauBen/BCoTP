@@ -787,11 +787,16 @@ module Draw = struct
           { x = x + ((4 + Resources.Font.y) * ui.hud.scale); y = y2 })
       p
 
+  let start_time = time ()
+
   let draw_splash e ui =
+    let frame = iof (time () -. start_time) mod Resources.splash.length in
     let scale = ui.hud.scale * 3 in
-    let py = (e.sizes.y / 2) - (len Resources.splash * scale / 2) in
-    let px = (e.sizes.x / 2) - (len Resources.splash.(0) * scale / 2) in
-    draw_bitmap Resources.splash { x = px; y = py } scale
+    let py = (e.sizes.y / 2) - (len Resources.splash.frames.(0) * scale / 2) in
+    let px =
+      (e.sizes.x / 2) - (len Resources.splash.frames.(0).(0) * scale / 2)
+    in
+    draw_bitmap Resources.splash.frames.(frame) { x = px; y = py } scale
 
   let draw_screen _ _ = ()
 
