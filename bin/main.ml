@@ -1,37 +1,55 @@
 open Bcotp
 open Aliases
 
-(* Nouvelle partie *)
-let game = Game.new_game ()
-
 let () =
   Graphics.open_graph " 1280x720";
   Graphics.set_window_title "Big Cities on Tiny Planets"
 
-let ui = Userinterface.new_ui game.cities.(0)
+let new_seed () =
+  let seed = iof (time ()) in
+  print_endline ("Creating a new world with seed " ^ string_of_int seed);
+  seed
 
-let t = ref (time ())
-
-let pt = ref !t
-
-(* Boucle principale du jeu *)
+let seed =
+  ref
+    (if len Sys.argv = 2 then
+     try int_of_string Sys.argv.(1) with Failure _ -> new_seed ()
+    else new_seed ())
 
 let () =
   try
     while true do
-      t := time ();
-      let dt = !t -. !pt in
-      pt := !t;
+      try
+        (* Nouvelle partie *)
+        let game = Game.new_game !seed in
 
-      Graphics.clear_graph ();
-      Graphics.auto_synchronize false;
+        let ui = Userinterface.new_ui game.cities.(0) in
 
-      Game.update game dt;
-      Userinterface.update ui;
-      Userinterface.draw ui;
+        let t = ref (time ()) in
+        let pt = ref !t in
 
-      Graphics.synchronize ();
-      Unix.sleepf 0.016
+        (* Boucle principale du jeu *)
+        let () =
+          while true do
+            t := time ();
+            let dt = !t -. !pt in
+            pt := !t;
+
+            Graphics.clear_graph ();
+            Graphics.auto_synchronize false;
+
+            Game.update game dt;
+            Userinterface.update ui;
+            Userinterface.draw ui;
+
+            Graphics.synchronize ();
+            Unix.sleepf 0.016
+          done
+        in
+        ()
+      with
+      | Replay -> ()
+      | New -> seed := new_seed ()
     done
   with
   | Graphics.Graphic_failure _ -> print_string "Bye!\n"

@@ -709,6 +709,45 @@ module Draw = struct
 
   let draw_hud _ _ = ()
 
+  let draw_replay_button button' ui =
+    draw_bitmap
+      (if button' == ui.hoveredElement then
+       Resources.Buttons.large_popup_button_hovered
+      else Resources.Buttons.large_popup_button)
+      button'.position ui.hud.scale;
+    draw_bitmap Resources.Font.replay button'.position ui.hud.scale
+
+  let draw_new_button button' ui =
+    draw_bitmap
+      (if button' == ui.hoveredElement then
+       Resources.Buttons.small_popup_button_hovered
+      else Resources.Buttons.small_popup_button)
+      button'.position ui.hud.scale;
+    draw_bitmap Resources.Font.text_new button'.position ui.hud.scale
+
+  let draw_quit_button button' ui =
+    draw_bitmap
+      (if button' == ui.hoveredElement then
+       Resources.Buttons.small_popup_button_hovered
+      else Resources.Buttons.small_popup_button)
+      button'.position ui.hud.scale;
+    draw_bitmap Resources.Font.quit button'.position ui.hud.scale
+
+  let draw_defeat_panel box' ui =
+    draw_bitmap Resources.defeat_screen box'.position ui.hud.scale;
+    let resource_corner =
+      {
+        x = box'.position.x + (60 * ui.hud.scale);
+        y = box'.position.y + (22 * ui.hud.scale);
+      }
+    in
+    if
+      Game.Calculations.get_resource ui.city.availableResources
+        Game.Resources.food
+      <= 0.
+    then draw_bitmap Resources.Icons.food resource_corner ui.hud.scale
+    else draw_bitmap Resources.Icons.water resource_corner ui.hud.scale
+
   (* Dessin des boutons *)
   let draw_delete_button button' ui =
     if Game.Interactions.show_delete_button ui.city then (
@@ -962,6 +1001,12 @@ module EventHandlers = struct
   let down_button_out button' ui = delete_button_out button' ui
 
   let down_button_click _ ui = Game.Interactions.down ui.city
+
+  let replay_button_click _ _ = raise Replay
+
+  let new_button_click _ _ = raise New
+
+  let quit_button_click _ _ = raise Exit
 end
 
 (* / EventHandlers *)
@@ -1184,6 +1229,107 @@ module Elements = struct
       ];
     info
 
+  let new_replay_button hud parent_position =
+    {
+      sizes =
+        {
+          x = len Resources.Buttons.large_popup_button.(0) * hud.scale;
+          y = len Resources.Buttons.large_popup_button * hud.scale;
+        };
+      position =
+        {
+          x = parent_position.x + (5 * hud.scale);
+          y = parent_position.y + (5 * hud.scale);
+        };
+      draw = Draw.draw_replay_button;
+      onMouseMove = None;
+      onMouseOver = None;
+      onMouseOut = None;
+      onMouseDown = None;
+      onMouseUp = None;
+      onMouseClick = Some EventHandlers.replay_button_click;
+      children = [];
+    }
+
+  let new_new_button hud parent_position =
+    {
+      sizes =
+        {
+          x = len Resources.Buttons.small_popup_button.(0) * hud.scale;
+          y = len Resources.Buttons.small_popup_button * hud.scale;
+        };
+      position =
+        {
+          x =
+            parent_position.x
+            + (len Resources.Buttons.large_popup_button.(0) + 2 + 5)
+              * hud.scale;
+          y = parent_position.y + (5 * hud.scale);
+        };
+      draw = Draw.draw_new_button;
+      onMouseMove = None;
+      onMouseOver = None;
+      onMouseOut = None;
+      onMouseDown = None;
+      onMouseUp = None;
+      onMouseClick = Some EventHandlers.new_button_click;
+      children = [];
+    }
+
+  let new_quit_button hud parent_position =
+    {
+      sizes =
+        {
+          x = len Resources.Buttons.small_popup_button.(0) * hud.scale;
+          y = len Resources.Buttons.small_popup_button * hud.scale;
+        };
+      position =
+        {
+          x =
+            parent_position.x
+            + (len Resources.Buttons.large_popup_button.(0)
+              + (2 * 2) + 5
+              + len Resources.Buttons.small_popup_button.(0))
+              * hud.scale;
+          y = parent_position.y + (5 * hud.scale);
+        };
+      draw = Draw.draw_quit_button;
+      onMouseMove = None;
+      onMouseOver = None;
+      onMouseOut = None;
+      onMouseDown = None;
+      onMouseUp = None;
+      onMouseClick = Some EventHandlers.quit_button_click;
+      children = [];
+    }
+
+  let new_defeat_panel hud =
+    let sizes =
+      {
+        x = hud.scale * len Resources.defeat_screen.(0);
+        y = hud.scale * len Resources.defeat_screen;
+      }
+    in
+    let position =
+      { x = (sx () / 2) - (sizes.x / 2); y = (sy () / 2) - (sizes.y / 2) }
+    in
+    {
+      sizes;
+      position;
+      draw = Draw.draw_defeat_panel;
+      onMouseMove = None;
+      onMouseOver = None;
+      onMouseOut = None;
+      onMouseDown = None;
+      onMouseUp = None;
+      onMouseClick = None;
+      children =
+        [
+          new_replay_button hud position; new_new_button hud position;
+          new_quit_button hud position;
+        ];
+    }
+
   let new_hud screen =
     let scale = Pixels.hud_scale screen in
     let hudHeight = Pixels.hud_height scale in
@@ -1402,8 +1548,8 @@ let update refUi =
       ui.hud.showProduction <- not ui.hud.showProduction;
     if KeyboardControls.is_esc k then Game.Interactions.nothing ui.city
   done;
-  if ui.city.state = Won || ui.city.state = GameOver then
-    ui.hud.element.children <- [];
+  if ui.city.state = GameOver && List.length ui.hud.element.children > 1 then
+    ui.hud.element.children <- [ Elements.new_defeat_panel ui.hud ];
   ui.scene.scene_scale <- max 1 (min ui.scene.scene_scale 12);
   ui.scene.cameraX <- modfl ui.scene.cameraX ui.city.width;
   ui.tick <- iof ui.city.time

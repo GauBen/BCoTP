@@ -29,3 +29,7 @@ let is_between a n b m =
   (a <= n && n <= b) || (a - m <= n && n <= b - m) || (a + m <= n && n <= b + m)
 
 let time = Unix.gettimeofday
+
+exception Replay
+
+exception New

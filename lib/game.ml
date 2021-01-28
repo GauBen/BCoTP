@@ -1206,7 +1206,11 @@ module City = struct
     let get_biome x =
       let w = 1. /. 12. in
       let h x =
-        let z = (foi x *. w) +. seed in
+        let z =
+          (foi x *. w)
+          +. foi (seed * 181 mod 1103)
+          +. (foi (seed mod 2753) /. 137.)
+        in
         let f z =
           (3. *. sin (3. *. z))
           +. (sin z *. cos z /. 2.)
@@ -1216,7 +1220,7 @@ module City = struct
         min (f z) (f (z +. w)) *. Float.abs (f z)
       in
       let y = h x in
-      let seeded_x = x + iof seed in
+      let seeded_x = x + seed in
       match if y < 0. then 0 else if y > 27. then 2 else 1 with
       | 0 -> Biomes.ocean
       | 2 -> Biomes.mountain
@@ -1227,7 +1231,7 @@ module City = struct
       (fun x biome ->
         let ground = ref [] in
         let biome = ref biome in
-        let seeded_x = x + iof seed in
+        let seeded_x = x + seed in
         if x >= width - 2 || (x >= 0 && x <= 4) then
           if not (Biomes.is_flat !biome) then biome := Biomes.plain;
         if (x = 5 || x = 6) && get_biome 7 <> Biomes.ocean then
@@ -1281,8 +1285,7 @@ module City = struct
         })
       (Array.init width get_biome)
 
-  let new_city () =
-    let seed = time () in
+  let new_city seed =
     {
       width = Defaults.planetWidth;
       cells = generate_cells seed Defaults.planetWidth;
@@ -1451,7 +1454,7 @@ end
 
 (* / Interactions *)
 
-let new_game () = { cities = [| City.new_city () |] }
+let new_game seed = { cities = [| City.new_city seed |] }
 
 let update game timeSinceLastUpdate =
   for i = 0 to last game.cities do
