@@ -302,7 +302,7 @@ end
 (* Fonctions de dessin *)
 module Draw = struct
   let _fill_rect { x; y } { x = width; y = height } =
-    try Graphics.fill_rect x y width height
+    try Graphics.fill_rect x y (width - 1) (height - 1)
     with Invalid_argument _ ->
       print_string
         (string_of_int x ^ " " ^ string_of_int y ^ " " ^ string_of_int width
