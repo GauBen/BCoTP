@@ -301,15 +301,14 @@ end
 
 (* Fonctions de dessin *)
 module Draw = struct
-  let _fill_rect { x; y } { x = width; y = height } =
-    try
-      if Sys.unix then Graphics.fill_rect x y (width - 1) (height - 1)
-      else Graphics.fill_rect x y width height
-    with Invalid_argument _ ->
-      print_string
-        (string_of_int x ^ " " ^ string_of_int y ^ " " ^ string_of_int width
-       ^ " " ^ string_of_int height ^ "\n");
-      flush stdout
+  let _fill_rect =
+    let _fill_rect_unix { x; y } { x = width; y = height } =
+      Graphics.fill_rect x y (width - 1) (height - 1)
+    in
+    let _fill_rect_win32 { x; y } { x = width; y = height } =
+      Graphics.fill_rect x y width height
+    in
+    if Sys.unix then _fill_rect_unix else _fill_rect_win32
 
   let _fill_rect_game_fixed scene' _ { x; y } =
     _fill_rect { x = x + scene'.position.x; y = y + scene'.position.y }
