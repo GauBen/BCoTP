@@ -1072,21 +1072,17 @@ module City = struct
         city.availableResources
 
   let explore city x =
-    let vision, range =
-      if (get city.cells x).biome = Biomes.mountain then ([ -2; -1; 1; 2 ], 2)
-      else ([ -4; -3; -2; -1; 1; 2; 3; 4 ], 4)
+    let view_distance cell = if Biomes.is_flat cell.biome then 3 else 1 in
+    let rec update x inc distance =
+      let cell = get city.cells x in
+      let distance = min (view_distance cell) distance in
+      if distance > 0 then (
+        cell.explored <- Yes;
+        update (x + inc) inc (distance - 1))
+      else if distance = 0 then cell.explored <- max cell.explored Discovered
     in
-    List.iter
-      (fun i ->
-        let cell = get city.cells (x + i) in
-        cell.explored <-
-          (if abs i = range then max Discovered cell.explored
-          else if
-          (cell.biome = Biomes.mountain && abs i = 1)
-          || cell.biome <> Biomes.mountain
-         then Yes
-          else max Discovered cell.explored))
-      vision
+    update (x - 1) (-1) (view_distance (get city.cells (x - 1)));
+    update (x + 1) 1 (view_distance (get city.cells (x + 1)))
 
   let upgrade city wS =
     if
