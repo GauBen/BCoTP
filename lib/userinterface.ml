@@ -539,6 +539,30 @@ module Draw = struct
           })
       ui.city.storage
 
+  let _draw_timer draw ui x m y y2 =
+    draw Resources.Icons.clock (2 * ui.hud.scale, y + y2);
+    let nb n x2 =
+      draw_padded_number_zeroes ui n 2
+        {
+          x =
+            x
+            + (4 + Resources.Font.y + 3 + (x2 * (Resources.Font.x + 1)) + m)
+              * ui.hud.scale;
+          y = y + y2;
+        }
+    in
+    nb (iof ui.city.time / 3600 mod 100) 0;
+    nb (iof ui.city.time / 60 mod 60) 3;
+    nb (iof ui.city.time mod 60) 6;
+    let colon x2 =
+      draw Resources.Font.colon
+        ( (4 + Resources.Font.y + 3 + (x2 * (Resources.Font.x + 1)) + m)
+          * ui.hud.scale,
+          y + y2 )
+    in
+    colon 2;
+    colon 5
+
   let _draw_hud_production element ui =
     let { x; y } = element.position in
     Graphics.set_color Resources.palette.(22);
@@ -552,29 +576,7 @@ module Draw = struct
           (2 + ((Game.Resources.length - p.name) * (Resources.Font.y + 2)))
           * ui.hud.scale
         in
-        if p.name = Game.Resources.villagers then (
-          draw Resources.Icons.clock (2 * ui.hud.scale, y + y2);
-          let nb n x2 =
-            draw_padded_number_zeroes ui n 2
-              {
-                x =
-                  x
-                  + (4 + Resources.Font.y + 3 + (x2 * (Resources.Font.x + 1)))
-                    * ui.hud.scale;
-                y = y + y2;
-              }
-          in
-          nb (iof ui.city.time / 3600 mod 100) 0;
-          nb (iof ui.city.time / 60 mod 60) 3;
-          nb (iof ui.city.time mod 60) 6;
-          let colon x2 =
-            draw Resources.Font.colon
-              ( (4 + Resources.Font.y + 3 + (x2 * (Resources.Font.x + 1)))
-                * ui.hud.scale,
-                y + y2 )
-          in
-          colon 2;
-          colon 5)
+        if p.name = Game.Resources.villagers then _draw_timer draw ui x 0 y y2
         else (
           draw (Game2Resources.icon p.name) (2 * ui.hud.scale, y + y2);
           draw_padded_signed_number ui
@@ -734,12 +736,12 @@ module Draw = struct
       button'.position ui.hud.scale;
     draw_bitmap Resources.Font.quit button'.position ui.hud.scale
 
-  let draw_defeat_panel box' ui =
-    draw_bitmap Resources.defeat_screen box'.position ui.hud.scale;
+  let draw_defeat_popup box' ui =
+    draw_bitmap Resources.defeat_popup box'.position ui.hud.scale;
     let resource_corner =
       {
-        x = box'.position.x + (60 * ui.hud.scale);
-        y = box'.position.y + (22 * ui.hud.scale);
+        x = box'.position.x + (36 * ui.hud.scale);
+        y = box'.position.y + (21 * ui.hud.scale);
       }
     in
     if
@@ -748,6 +750,19 @@ module Draw = struct
       <= 0.
     then draw_bitmap Resources.Icons.food resource_corner ui.hud.scale
     else draw_bitmap Resources.Icons.water resource_corner ui.hud.scale
+
+  let draw_victory_popup box' ui =
+    draw_bitmap Resources.victory_popup box'.position ui.hud.scale;
+    _draw_timer
+      (fun thing (x2, y2) ->
+        draw_bitmap thing
+          { x = box'.position.x + x2 + (19 * ui.hud.scale); y = y2 }
+          ui.hud.scale)
+      ui
+      (box'.position.x + (19 * ui.hud.scale))
+      (-2)
+      (box'.position.y + (21 * ui.hud.scale))
+      0
 
   (* Dessin des boutons *)
   let draw_delete_button button' ui =
@@ -1304,11 +1319,11 @@ module Elements = struct
       children = [];
     }
 
-  let new_defeat_panel hud =
+  let new_defeat_popup hud =
     let sizes =
       {
-        x = hud.scale * len Resources.defeat_screen.(0);
-        y = hud.scale * len Resources.defeat_screen;
+        x = hud.scale * len Resources.defeat_popup.(0);
+        y = hud.scale * len Resources.defeat_popup;
       }
     in
     let position =
@@ -1317,7 +1332,34 @@ module Elements = struct
     {
       sizes;
       position;
-      draw = Draw.draw_defeat_panel;
+      draw = Draw.draw_defeat_popup;
+      onMouseMove = None;
+      onMouseOver = None;
+      onMouseOut = None;
+      onMouseDown = None;
+      onMouseUp = None;
+      onMouseClick = None;
+      children =
+        [
+          new_replay_button hud position; new_new_button hud position;
+          new_quit_button hud position;
+        ];
+    }
+
+  let new_victory_popup hud =
+    let sizes =
+      {
+        x = hud.scale * len Resources.victory_popup.(0);
+        y = hud.scale * len Resources.victory_popup;
+      }
+    in
+    let position =
+      { x = (sx () / 2) - (sizes.x / 2); y = (sy () / 2) - (sizes.y / 2) }
+    in
+    {
+      sizes;
+      position;
+      draw = Draw.draw_victory_popup;
       onMouseMove = None;
       onMouseOver = None;
       onMouseOut = None;
@@ -1550,7 +1592,9 @@ let update refUi =
     if KeyboardControls.is_esc k then Game.Interactions.nothing ui.city
   done;
   if ui.city.state = GameOver && List.length ui.hud.element.children > 1 then
-    ui.hud.element.children <- [ Elements.new_defeat_panel ui.hud ];
+    ui.hud.element.children <- [ Elements.new_defeat_popup ui.hud ]
+  else if ui.city.state = Won && List.length ui.hud.element.children > 1 then
+    ui.hud.element.children <- [ Elements.new_victory_popup ui.hud ];
   ui.scene.scene_scale <- max 1 (min ui.scene.scene_scale 12);
   ui.scene.cameraX <- modfl ui.scene.cameraX ui.city.width;
   ui.tick <- iof ui.city.time
