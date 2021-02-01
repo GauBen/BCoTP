@@ -622,7 +622,7 @@ module Structures = struct
               ];
             production = [];
             storage = [];
-          };
+          }; { initialResources = []; production = []; storage = [] };
         |];
       width = 1;
       editable = true;
@@ -989,15 +989,34 @@ module City = struct
           else List.map (fun r -> { name = r.name; amount = 0. }) prod);
         { production = wS.production; produced }
 
+  let is_cell_empty city (structure : structure) x =
+    let pc = get city.cells (x - 1) in
+    List.for_all
+      (fun a -> a) (* Autres bâtiments qui gênent ? *)
+      (List.init structure.width (fun i ->
+           List.for_all
+             (function
+               | { coords = { overground; _ }; _ }
+                 when overground = structure.overground ->
+                   false
+               | _ -> true)
+             (get city.cells (x + i)).ground))
+    && List.for_all
+         (function
+           | { coords = { overground; _ }; width = 2; _ }
+             when overground = structure.overground ->
+               false
+           | _ -> true)
+         pc.ground
+
   let can_build city structure x =
     let pc = get city.cells (x - 1) in
     let c = get city.cells x in
     let nc = get city.cells (x + 1) in
-    let o = structure.overground in
     (* Partie découverte ? *)
     c.explored = Yes
     && ((* Biome constructible ? *)
-        c.biome <> Biomes.ocean && c.biome <> Biomes.mountain
+        Biomes.is_flat c.biome
         && structure <> Structures.crops
         && structure <> Structures.harbor
         && structure <> Structures.boat
@@ -1008,25 +1027,19 @@ module City = struct
           && (pc.biome <> Biomes.ocean || nc.biome <> Biomes.ocean)
        || c.biome = Biomes.mountain && false
           && (pc.biome <> Biomes.mountain || nc.biome <> Biomes.mountain)
-       || (c.biome = Biomes.ocean && structure = Structures.boat)
+       || (c.biome = Biomes.ocean
+          && structure = Structures.boat
+          &&
+          let cell_contains_harbor cell =
+            List.exists
+              (fun ws -> ws.structure == Structures.harbor)
+              cell.ground
+          in
+          cell_contains_harbor pc || cell_contains_harbor nc)
        || (c.biome = Biomes.mountain && structure = Structures.tunnel))
     && (structure.width = 1
        || (nc.biome <> Biomes.mountain && nc.biome <> Biomes.ocean))
-    && List.for_all
-         (fun a -> a) (* Autres bâtiments qui gênent ? *)
-         (List.init structure.width (fun i ->
-              List.for_all
-                (function
-                  | { coords = { overground; _ }; _ } when overground = o ->
-                      false
-                  | _ -> true)
-                (get city.cells (x + i)).ground))
-    && List.for_all
-         (function
-           | { coords = { overground; _ }; width = 2; _ } when overground = o ->
-               false
-           | _ -> true)
-         pc.ground
+    && is_cell_empty city structure x
 
   let can_buy city (structure, level) =
     let l = structure.levels.(level) in
@@ -1088,6 +1101,7 @@ module City = struct
     if
       wS.level < last wS.structure.levels
       && can_buy city (wS.structure, wS.level + 1)
+      && wS.structure <> Structures.boat
     then (
       let l = wS.structure.levels.(wS.level + 1) in
       city.availableResources <-
@@ -1099,10 +1113,11 @@ module City = struct
       wS.storage <- l.storage;
       update_storage city;
       if wS.structure = Structures.rocketStation && wS.level = 2 then
-        you_win city);
-    if
+        you_win city)
+    else if
       wS.structure = Structures.boat
-      && can_build city Structures.boat (wS.coords.x - 1)
+      && is_cell_empty city wS.structure (wS.coords.x - 1)
+      && (get city.cells (wS.coords.x - 1)).biome = Biomes.ocean
     then (
       let pcell = get city.cells wS.coords.x in
       pcell.ground <- List.filter (fun i -> i <> wS) pcell.ground;
@@ -1113,10 +1128,11 @@ module City = struct
           x = modpos (wS.coords.x - 1) city.width;
           overground = wS.coords.overground;
         };
+      wS.level <- 0;
       explore city wS.coords.x)
 
   let downgrade city wS =
-    if wS.level > 0 then (
+    if wS.level > 0 && wS.structure <> Structures.boat then (
       let res =
         List.map
           (fun r -> { r with amount = -.r.amount })
@@ -1131,10 +1147,11 @@ module City = struct
       wS.level <- wS.level - 1;
       let l = wS.structure.levels.(wS.level) in
       wS.storage <- l.storage;
-      update_storage city);
-    if
+      update_storage city)
+    else if
       wS.structure = Structures.boat
-      && can_build city Structures.boat (wS.coords.x + 1)
+      && is_cell_empty city wS.structure (wS.coords.x + 1)
+      && (get city.cells (wS.coords.x + 1)).biome = Biomes.ocean
     then (
       let pcell = get city.cells wS.coords.x in
       pcell.ground <- List.filter (fun i -> i <> wS) pcell.ground;
@@ -1145,6 +1162,7 @@ module City = struct
           x = modpos (wS.coords.x + 1) city.width;
           overground = wS.coords.overground;
         };
+      wS.level <- 1;
       explore city wS.coords.x)
 
   let build city (structure, level) x =

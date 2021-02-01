@@ -612,7 +612,11 @@ module Draw = struct
         box'.sizes.y + box'.position.y
         - (ui.hud.scale * (i + 1) * (Resources.Font.y + 2))
       in
-      let lvl = (List.nth ui.city.interactions.selection 0).level + 1 in
+      let selection = List.nth ui.city.interactions.selection 0 in
+      let lvl =
+        if selection.structure = Game.Structures.boat then 1
+        else selection.level + 1
+      in
       _draw_character ui Resources.Font.lvl
         { x = x + (17 * ui.hud.scale); y = y2 0 };
       draw_padded_number ui lvl 1 { x = x + (28 * ui.hud.scale); y = y2 0 };
