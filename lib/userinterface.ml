@@ -1171,7 +1171,7 @@ module Elements = struct
     {
       position =
         {
-          x = info.position.x + (2 * hud.scale);
+          x = info.position.x + (3 * hud.scale);
           y = info.position.y + (2 * hud.scale);
         };
       sizes =
@@ -1196,7 +1196,7 @@ module Elements = struct
           x =
             info.position.x
             + (Resources.Widths.smallButton * hud.scale)
-            + (4 * hud.scale);
+            + (6 * hud.scale);
           y = info.position.y + (2 * hud.scale);
         };
       sizes =
@@ -1221,7 +1221,7 @@ module Elements = struct
           x =
             info.position.x
             + (2 * Resources.Widths.smallButton * hud.scale)
-            + (6 * hud.scale);
+            + (9 * hud.scale);
           y = info.position.y + (2 * hud.scale);
         };
       sizes =
