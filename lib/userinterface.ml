@@ -142,7 +142,7 @@ module Pixels = struct
     (2 + ((Resources.Font.y + 2) * Game.Resources.length)) * scale
 
   let resource_panel_width scale =
-    ((2 * 2) + Resources.Font.y + (9 * Resources.Font.x) + 9 + 3) * scale
+    ((2 * 2) + Resources.Font.y + (9 * Resources.Font.x) + 9 + 4) * scale
 
   let building_panel_width scale =
     ((3 * 2) + ((Resources.Widths.button + 2) * Layout.buildingPanelCols) - 2)
@@ -504,8 +504,6 @@ module Draw = struct
 
   let _draw_hud_availableRes element ui =
     let { x; y } = element.position in
-    Graphics.set_color Resources.palette.(22);
-    _fill_rect { x; y } element.sizes;
     let draw thing (x2, y2) =
       draw_bitmap thing { x = x + x2; y = y + y2 } ui.hud.scale
     in
@@ -565,8 +563,6 @@ module Draw = struct
 
   let _draw_hud_production element ui =
     let { x; y } = element.position in
-    Graphics.set_color Resources.palette.(22);
-    _fill_rect { x; y } element.sizes;
     let draw thing (x2, y2) =
       draw_bitmap thing { x = x + x2; y = y + y2 } ui.hud.scale
     in
@@ -598,15 +594,11 @@ module Draw = struct
     else _draw_hud_availableRes)
       element ui
 
-  let draw_hud_buildings element _ =
-    Graphics.set_color Resources.palette.(22);
-    _fill_rect element.position element.sizes
+  let draw_hud_buildings _ _ = ()
 
   (* Infos sur les bâtiments sélectionnés *)
   let draw_hud_info box' ui =
     let { x; y } = box'.position in
-    Graphics.set_color Resources.palette.(22);
-    _fill_rect { x; y } box'.sizes;
     if List.length ui.city.interactions.selection >= 1 then (
       let y2 i =
         box'.sizes.y + box'.position.y
@@ -714,7 +706,10 @@ module Draw = struct
               wS.availableResources)
         ui.city.interactions.selection)
 
-  let draw_hud _ _ = ()
+  let draw_hud box ui =
+    draw_bitmap Resources.hud
+      { x = box.position.x - (3 * ui.hud.scale); y = box.position.y }
+      ui.hud.scale
 
   let draw_replay_button button' ui =
     draw_bitmap
@@ -1151,7 +1146,7 @@ module Elements = struct
     {
       position =
         {
-          x = info.position.x + (4 * hud.scale);
+          x = info.position.x + (2 * hud.scale);
           y = info.position.y + (2 * hud.scale);
         };
       sizes =
@@ -1176,7 +1171,7 @@ module Elements = struct
           x =
             info.position.x
             + (Resources.Widths.smallButton * hud.scale)
-            + (6 * hud.scale);
+            + (4 * hud.scale);
           y = info.position.y + (2 * hud.scale);
         };
       sizes =
@@ -1201,7 +1196,7 @@ module Elements = struct
           x =
             info.position.x
             + (2 * Resources.Widths.smallButton * hud.scale)
-            + (8 * hud.scale);
+            + (6 * hud.scale);
           y = info.position.y + (2 * hud.scale);
         };
       sizes =
@@ -1225,7 +1220,7 @@ module Elements = struct
         position =
           {
             x =
-              hud.element.position.x + (2 * hud.scale)
+              hud.element.position.x + (3 * hud.scale)
               + Pixels.resource_panel_width hud.scale
               + Pixels.building_panel_width hud.scale;
             y = 0;
