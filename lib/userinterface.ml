@@ -573,6 +573,31 @@ module Draw = struct
           * ui.hud.scale
         in
         if p.name = Game.Resources.villagers then _draw_timer draw ui x 0 y y2
+        else if p.name = Game.Resources.electricity then (
+          let draw thing (x2, y2) =
+            draw_bitmap thing { x = x + x2; y = y + y2 } ui.hud.scale
+          in
+          draw (Game2Resources.icon p.name) (2 * ui.hud.scale, y + y2);
+          draw_padded_number ui
+            (iof
+               (Game.Calculations.get_resource ui.city.availableResources
+                  p.name))
+            4
+            { x = x + ((4 + Resources.Font.y) * ui.hud.scale); y = y + y2 };
+          draw Resources.Font.slash
+            ( (4 + (Resources.Font.x * 4) + 3 + Resources.Font.y + 2)
+              * ui.hud.scale,
+              y + y2 );
+          draw_padded_number ui
+            (iof (Game.Calculations.get_resource ui.city.storage p.name))
+            4
+            {
+              x =
+                x
+                + (4 + (Resources.Font.x * 5) + 3 + 2 + Resources.Font.y + 2)
+                  * ui.hud.scale;
+              y = y + y2;
+            })
         else (
           draw (Game2Resources.icon p.name) (2 * ui.hud.scale, y + y2);
           draw_padded_signed_number ui

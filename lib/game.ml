@@ -99,7 +99,9 @@ module Resources = struct
 
   let electricity = 8
 
-  let length = 8 (* Nombre de ressources différentes *)
+  let length = 8
+
+  let is_not_producible r = r = villagers || r = electricity
 end
 
 (* Environnements *)
@@ -241,12 +243,12 @@ module Structures = struct
           {
             initialResources =
               [
-                { name = Resources.villagers; amount = 5. };
-                { name = Resources.water; amount = 60. };
-                { name = Resources.food; amount = 51. };
-                { name = Resources.wood; amount = 85. };
-                { name = Resources.sand; amount = 30. };
-                { name = Resources.metal; amount = 0. };
+                { name = Resources.villagers; amount = 50. };
+                { name = Resources.water; amount = 9999. };
+                { name = Resources.food; amount = 9999. };
+                { name = Resources.wood; amount = 9999. };
+                { name = Resources.sand; amount = 9999. };
+                { name = Resources.metal; amount = 9999. };
                 { name = Resources.oil; amount = 0. };
                 { name = Resources.electricity; amount = 0. };
               ];
@@ -257,12 +259,12 @@ module Structures = struct
               ];
             storage =
               [
-                { name = Resources.villagers; amount = 5. };
-                { name = Resources.water; amount = 120. };
-                { name = Resources.food; amount = 100. };
-                { name = Resources.wood; amount = 250. };
-                { name = Resources.sand; amount = 100. };
-                { name = Resources.metal; amount = 0. };
+                { name = Resources.villagers; amount = 50. };
+                { name = Resources.water; amount = 9999. };
+                { name = Resources.food; amount = 9999. };
+                { name = Resources.wood; amount = 9999. };
+                { name = Resources.sand; amount = 9999. };
+                { name = Resources.metal; amount = 9999. };
                 { name = Resources.oil; amount = 0. };
                 { name = Resources.electricity; amount = 0. };
               ];
@@ -449,13 +451,10 @@ module Structures = struct
                 { name = Resources.villagers; amount = -5. };
                 { name = Resources.sand; amount = -100. };
                 { name = Resources.metal; amount = -120. };
+                { name = Resources.electricity; amount = 50. };
               ];
-            production =
-              [
-                { name = Resources.wood; amount = -0.25 };
-                { name = Resources.electricity; amount = 3. };
-              ];
-            storage = [ { name = Resources.electricity; amount = 20. } ];
+            production = [ { name = Resources.wood; amount = -0.25 } ];
+            storage = [ { name = Resources.electricity; amount = 50. } ];
           };
         |];
       width = 1;
@@ -639,12 +638,9 @@ module Structures = struct
                 { name = Resources.villagers; amount = -15. };
                 { name = Resources.wood; amount = -200. };
                 { name = Resources.sand; amount = -500. };
+                { name = Resources.electricity; amount = -50. };
               ];
-            production =
-              [
-                { name = Resources.food; amount = -0.5 };
-                { name = Resources.electricity; amount = -3. };
-              ];
+            production = [ { name = Resources.food; amount = -0.5 } ];
             storage = [];
           };
         |];
@@ -663,8 +659,9 @@ module Structures = struct
                 { name = Resources.villagers; amount = -20. };
                 { name = Resources.sand; amount = -500. };
                 { name = Resources.metal; amount = -500. };
+                { name = Resources.electricity; amount = -50. };
               ];
-            production = [ { name = Resources.electricity; amount = -3. } ];
+            production = [];
             storage = [ { name = Resources.oil; amount = 500. } ];
           };
           {
@@ -672,13 +669,14 @@ module Structures = struct
               [
                 { name = Resources.metal; amount = -500. };
                 { name = Resources.oil; amount = -500. };
+                { name = Resources.electricity; amount = -25. };
               ];
-            production = [ { name = Resources.electricity; amount = -1. } ];
+            production = [];
             storage = [ { name = Resources.oil; amount = 500. } ];
           };
           {
             initialResources = [];
-            production = [ { name = Resources.electricity; amount = -1. } ];
+            production = [];
             storage = [ { name = Resources.oil; amount = 500. } ];
           };
         |];
@@ -696,9 +694,10 @@ module Structures = struct
               [
                 { name = Resources.sand; amount = -50. };
                 { name = Resources.metal; amount = -100. };
+                { name = Resources.electricity; amount = 20. };
               ];
-            production = [ { name = Resources.electricity; amount = 1. } ];
-            storage = [ { name = Resources.electricity; amount = 10. } ];
+            production = [];
+            storage = [ { name = Resources.electricity; amount = 20. } ];
           };
         |];
       width = 1;
@@ -1137,7 +1136,7 @@ module City = struct
         List.map
           (fun r -> { r with amount = -.r.amount })
           (List.filter
-             (fun r -> r.name = Resources.villagers)
+             (fun r -> Resources.is_not_producible r.name)
              wS.structure.levels.(wS.level).initialResources)
       in
       city.availableResources <-
@@ -1196,7 +1195,7 @@ module City = struct
             List.map
               (fun r -> { r with amount = -.r.amount })
               (List.filter
-                 (fun r -> r.amount > 0. || r.name = Resources.villagers)
+                 (fun r -> r.amount > 0. || Resources.is_not_producible r.name)
                  wS.initialResources);
           ];
       update_storage city);
@@ -1442,7 +1441,7 @@ module Interactions = struct
     List.map
       (fun r -> { r with amount = -.r.amount })
       (List.filter
-         (fun r -> r.amount > 0. || r.name = Resources.villagers)
+         (fun r -> r.amount > 0. || Resources.is_not_producible r.name)
          (List.hd city.interactions.selection).initialResources)
 
   let earned_on_downgrade city =
@@ -1450,7 +1449,7 @@ module Interactions = struct
     List.map
       (fun r -> { r with amount = -.r.amount })
       (List.filter
-         (fun r -> r.name = Resources.villagers)
+         (fun r -> Resources.is_not_producible r.name)
          wS.structure.levels.(wS.level).initialResources)
 
   let up_price city =
