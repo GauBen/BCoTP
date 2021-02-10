@@ -29,24 +29,21 @@ let () =
         let pt = ref !t in
 
         (* Boucle principale du jeu *)
-        let () =
-          while true do
-            t := time ();
-            let dt = !t -. !pt in
-            pt := !t;
+        while true do
+          t := time ();
+          let dt = !t -. !pt in
+          pt := !t;
 
-            Graphics.clear_graph ();
-            Graphics.auto_synchronize false;
+          Graphics.clear_graph ();
+          Graphics.auto_synchronize false;
 
-            Game.update game dt;
-            Userinterface.update ui;
-            Userinterface.draw ui;
+          Game.update game dt;
+          Userinterface.update ui;
+          Userinterface.draw ui;
 
-            Graphics.synchronize ();
-            Unix.sleepf 0.016
-          done
-        in
-        ()
+          Graphics.synchronize ();
+          Unix.sleepf 0.016
+        done
       with
       | Replay -> ()
       | New -> seed := new_seed ()
