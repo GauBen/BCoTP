@@ -130,12 +130,12 @@ module Structures = struct
             storage = [];
           };
           {
-            initialResources = [ { name = Resources.wood; amount = 300. } ];
+            initialResources = [ { name = Resources.wood; amount = 200. } ];
             production = [];
             storage = [];
           };
           {
-            initialResources = [ { name = Resources.wood; amount = 600. } ];
+            initialResources = [ { name = Resources.wood; amount = 250. } ];
             production = [];
             storage = [];
           };
@@ -150,17 +150,17 @@ module Structures = struct
       levels =
         [|
           {
-            initialResources = [ { name = Resources.water; amount = 300. } ];
+            initialResources = [ { name = Resources.water; amount = 250. } ];
             production = [];
             storage = [];
           };
           {
-            initialResources = [ { name = Resources.water; amount = 600. } ];
+            initialResources = [ { name = Resources.water; amount = 500. } ];
             production = [];
             storage = [];
           };
           {
-            initialResources = [ { name = Resources.water; amount = 1200. } ];
+            initialResources = [ { name = Resources.water; amount = 1000. } ];
             production = [];
             storage = [];
           };
@@ -180,12 +180,12 @@ module Structures = struct
             storage = [];
           };
           {
-            initialResources = [ { name = Resources.metal; amount = 400. } ];
+            initialResources = [ { name = Resources.metal; amount = 300. } ];
             production = [];
             storage = [];
           };
           {
-            initialResources = [ { name = Resources.metal; amount = 800. } ];
+            initialResources = [ { name = Resources.metal; amount = 400. } ];
             production = [];
             storage = [];
           };
@@ -205,12 +205,12 @@ module Structures = struct
             storage = [];
           };
           {
-            initialResources = [ { name = Resources.oil; amount = 400. } ];
+            initialResources = [ { name = Resources.oil; amount = 250. } ];
             production = [];
             storage = [];
           };
           {
-            initialResources = [ { name = Resources.oil; amount = 800. } ];
+            initialResources = [ { name = Resources.oil; amount = 300. } ];
             production = [];
             storage = [];
           };
@@ -243,28 +243,28 @@ module Structures = struct
           {
             initialResources =
               [
-                { name = Resources.villagers; amount = 50. };
-                { name = Resources.water; amount = 9999. };
-                { name = Resources.food; amount = 9999. };
-                { name = Resources.wood; amount = 9999. };
-                { name = Resources.sand; amount = 9999. };
-                { name = Resources.metal; amount = 9999. };
+                { name = Resources.villagers; amount = 5. };
+                { name = Resources.water; amount = 30. };
+                { name = Resources.food; amount = 21. };
+                { name = Resources.wood; amount = 100. };
+                { name = Resources.sand; amount = 50. };
+                { name = Resources.metal; amount = 0. };
                 { name = Resources.oil; amount = 0. };
                 { name = Resources.electricity; amount = 0. };
               ];
             production =
               [
                 { name = Resources.water; amount = -0.25 };
-                { name = Resources.food; amount = -0.16667 };
+                { name = Resources.food; amount = -1. /. 6. };
               ];
             storage =
               [
-                { name = Resources.villagers; amount = 50. };
-                { name = Resources.water; amount = 9999. };
-                { name = Resources.food; amount = 9999. };
-                { name = Resources.wood; amount = 9999. };
-                { name = Resources.sand; amount = 9999. };
-                { name = Resources.metal; amount = 9999. };
+                { name = Resources.villagers; amount = 5. };
+                { name = Resources.water; amount = 50. };
+                { name = Resources.food; amount = 100. };
+                { name = Resources.wood; amount = 300. };
+                { name = Resources.sand; amount = 150. };
+                { name = Resources.metal; amount = 100. };
                 { name = Resources.oil; amount = 0. };
                 { name = Resources.electricity; amount = 0. };
               ];
@@ -288,13 +288,13 @@ module Structures = struct
             production =
               [
                 { name = Resources.water; amount = -0.25 };
-                { name = Resources.food; amount = -0.16667 };
+                { name = Resources.food; amount = -1. /. 6. };
               ];
             storage =
               [
                 { name = Resources.villagers; amount = 5. };
-                { name = Resources.water; amount = 40. };
-                { name = Resources.food; amount = 30. };
+                { name = Resources.water; amount = 50. };
+                { name = Resources.food; amount = 50. };
               ];
           };
         |];
@@ -311,14 +311,13 @@ module Structures = struct
             initialResources =
               [
                 { name = Resources.villagers; amount = 20. };
-                { name = Resources.wood; amount = -80. };
                 { name = Resources.sand; amount = -300. };
                 { name = Resources.metal; amount = -50. };
               ];
             production =
               [
                 { name = Resources.water; amount = -1. };
-                { name = Resources.food; amount = -0.66667 };
+                { name = Resources.food; amount = -2. /. 3. };
               ];
             storage =
               [
@@ -331,8 +330,7 @@ module Structures = struct
             initialResources =
               [
                 { name = Resources.villagers; amount = 10. };
-                { name = Resources.wood; amount = -40. };
-                { name = Resources.sand; amount = -150. };
+                { name = Resources.sand; amount = -100. };
                 { name = Resources.metal; amount = -50. };
               ];
             production =
@@ -357,13 +355,13 @@ module Structures = struct
             production =
               [
                 { name = Resources.water; amount = -2. };
-                { name = Resources.food; amount = -1.33334 };
+                { name = Resources.food; amount = -4. /. 3. };
               ];
             storage =
               [
                 { name = Resources.villagers; amount = 40. };
-                { name = Resources.water; amount = 300. };
-                { name = Resources.food; amount = 300. };
+                { name = Resources.water; amount = 200. };
+                { name = Resources.food; amount = 200. };
               ];
           };
         |];
@@ -379,21 +377,20 @@ module Structures = struct
           {
             initialResources =
               [
-                { name = Resources.wood; amount = -50. };
-                { name = Resources.sand; amount = -50. };
+                { name = Resources.wood; amount = -10. };
+                { name = Resources.sand; amount = -40. };
               ];
             production = [ { name = Resources.water; amount = 0.5 } ];
-            storage = [ { name = Resources.water; amount = 100. } ];
+            storage = [ { name = Resources.water; amount = 50. } ];
           };
           {
             initialResources =
               [
-                { name = Resources.villagers; amount = -1. };
-                { name = Resources.sand; amount = -200. };
-                { name = Resources.metal; amount = -50. };
+                { name = Resources.sand; amount = -150. };
+                { name = Resources.metal; amount = -25. };
               ];
             production = [ { name = Resources.water; amount = 1.5 } ];
-            storage = [ { name = Resources.water; amount = 500. } ];
+            storage = [ { name = Resources.water; amount = 250. } ];
           };
         |];
       width = 1;
@@ -408,9 +405,8 @@ module Structures = struct
           {
             initialResources =
               [
-                { name = Resources.wood; amount = -50. };
-                { name = Resources.sand; amount = -50. };
-                { name = Resources.metal; amount = -100. };
+                { name = Resources.sand; amount = -100. };
+                { name = Resources.metal; amount = -75. };
               ];
             production = [ { name = Resources.oil; amount = 0.5 } ];
             storage = [ { name = Resources.oil; amount = 150. } ];
@@ -430,7 +426,6 @@ module Structures = struct
               [
                 { name = Resources.wood; amount = -50. };
                 { name = Resources.sand; amount = -100. };
-                { name = Resources.metal; amount = -25. };
               ];
             production = [];
             storage = [];
@@ -449,8 +444,8 @@ module Structures = struct
             initialResources =
               [
                 { name = Resources.villagers; amount = -5. };
-                { name = Resources.sand; amount = -100. };
-                { name = Resources.metal; amount = -120. };
+                { name = Resources.sand; amount = -150. };
+                { name = Resources.metal; amount = -100. };
                 { name = Resources.electricity; amount = 50. };
               ];
             production = [ { name = Resources.wood; amount = -0.25 } ];
@@ -470,13 +465,10 @@ module Structures = struct
             initialResources =
               [
                 { name = Resources.villagers; amount = -1. };
-                { name = Resources.wood; amount = -25. };
+                { name = Resources.water; amount = -5. };
+                { name = Resources.wood; amount = -20. };
               ];
-            production =
-              [
-                { name = Resources.water; amount = -0.01667 };
-                { name = Resources.food; amount = 0.66667 };
-              ];
+            production = [ { name = Resources.food; amount = 2. /. 3. } ];
             storage = [];
           };
         |];
@@ -492,18 +484,18 @@ module Structures = struct
           {
             initialResources =
               [
-                { name = Resources.villagers; amount = -2. };
-                { name = Resources.wood; amount = -125. };
+                { name = Resources.villagers; amount = -3. };
+                { name = Resources.wood; amount = -175. };
               ];
             production =
               [
-                { name = Resources.water; amount = -0.08333 };
-                { name = Resources.food; amount = 1.5 };
+                { name = Resources.water; amount = -1. /. 12. };
+                { name = Resources.food; amount = 5. /. 3. };
               ];
             storage = [ { name = Resources.food; amount = 200. } ];
           };
         |];
-      width = 1;
+      width = 2;
       editable = true;
       overground = true;
     }
@@ -519,17 +511,17 @@ module Structures = struct
                 { name = Resources.wood; amount = -40. };
               ];
             production = [ { name = Resources.wood; amount = 0.5 } ];
-            storage = [ { name = Resources.wood; amount = 200. } ];
+            storage = [ { name = Resources.wood; amount = 150. } ];
           };
           {
             initialResources = [ { name = Resources.villagers; amount = -1. } ];
             production = [ { name = Resources.wood; amount = 1. } ];
-            storage = [ { name = Resources.wood; amount = 200. } ];
+            storage = [ { name = Resources.wood; amount = 150. } ];
           };
           {
             initialResources = [ { name = Resources.villagers; amount = -1. } ];
             production = [ { name = Resources.wood; amount = 1.5 } ];
-            storage = [ { name = Resources.wood; amount = 200. } ];
+            storage = [ { name = Resources.wood; amount = 150. } ];
           };
         |];
       width = 1;
@@ -549,7 +541,7 @@ module Structures = struct
               ];
             production =
               [
-                { name = Resources.metal; amount = 0.16667 };
+                { name = Resources.metal; amount = 1. /. 6. };
                 { name = Resources.sand; amount = 0.5 };
               ];
             storage =
@@ -562,7 +554,7 @@ module Structures = struct
             initialResources = [ { name = Resources.villagers; amount = -1. } ];
             production =
               [
-                { name = Resources.metal; amount = 0.3334 };
+                { name = Resources.metal; amount = 1. /. 3. };
                 { name = Resources.sand; amount = 1. };
               ];
             storage =
@@ -597,8 +589,8 @@ module Structures = struct
           {
             initialResources =
               [
-                { name = Resources.villagers; amount = -2. };
-                { name = Resources.wood; amount = -120. };
+                { name = Resources.villagers; amount = -1. };
+                { name = Resources.wood; amount = -100. };
               ];
             production = [];
             storage = [];
@@ -617,7 +609,7 @@ module Structures = struct
             initialResources =
               [
                 { name = Resources.villagers; amount = -2. };
-                { name = Resources.wood; amount = -150. };
+                { name = Resources.wood; amount = -75. };
               ];
             production = [];
             storage = [];
@@ -637,7 +629,7 @@ module Structures = struct
               [
                 { name = Resources.villagers; amount = -15. };
                 { name = Resources.wood; amount = -200. };
-                { name = Resources.sand; amount = -500. };
+                { name = Resources.sand; amount = -400. };
                 { name = Resources.electricity; amount = -50. };
               ];
             production = [ { name = Resources.food; amount = -0.5 } ];
@@ -667,15 +659,15 @@ module Structures = struct
           {
             initialResources =
               [
-                { name = Resources.metal; amount = -500. };
+                { name = Resources.metal; amount = -250. };
                 { name = Resources.oil; amount = -500. };
-                { name = Resources.electricity; amount = -25. };
               ];
             production = [];
             storage = [ { name = Resources.oil; amount = 500. } ];
           };
           {
-            initialResources = [];
+            initialResources =
+              [ { name = Resources.electricity; amount = -25. } ];
             production = [];
             storage = [ { name = Resources.oil; amount = 500. } ];
           };
@@ -693,11 +685,11 @@ module Structures = struct
             initialResources =
               [
                 { name = Resources.sand; amount = -50. };
-                { name = Resources.metal; amount = -100. };
-                { name = Resources.electricity; amount = 20. };
+                { name = Resources.metal; amount = -50. };
+                { name = Resources.electricity; amount = 25. };
               ];
             production = [];
-            storage = [ { name = Resources.electricity; amount = 20. } ];
+            storage = [ { name = Resources.electricity; amount = 25. } ];
           };
         |];
       width = 1;
