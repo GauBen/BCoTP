@@ -732,9 +732,10 @@ module Draw = struct
         ui.city.interactions.selection)
 
   let draw_hud box ui =
-    draw_bitmap Resources.hud
-      { x = box.position.x - (3 * ui.hud.scale); y = box.position.y }
-      ui.hud.scale
+    if ui.city.state <> Won && ui.city.state <> GameOver then
+      draw_bitmap Resources.hud
+        { x = box.position.x - (3 * ui.hud.scale); y = box.position.y }
+        ui.hud.scale
 
   let draw_replay_button button' ui =
     draw_bitmap
