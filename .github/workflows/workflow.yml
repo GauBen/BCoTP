@@ -31,10 +31,6 @@ jobs:
         with:
           ocaml-version: ${{ matrix.ocaml-version }}
 
-      - name: Patch Graphics on Windows
-        if: runner.os == 'Windows'
-        run: opam pin add graphics git+https://github.com/ocaml/graphics
-
       - run: opam pin add bcotp.dev . --no-action
 
       - run: opam depext bcotp.dev --yes
