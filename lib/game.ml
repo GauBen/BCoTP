@@ -981,7 +981,6 @@ module City = struct
         { production = wS.production; produced }
 
   let is_cell_empty city (structure : structure) x =
-    let pc = get city.cells (x - 1) in
     List.for_all
       (fun a -> a) (* Autres bâtiments qui gênent ? *)
       (List.init structure.width (fun i ->
@@ -998,14 +997,26 @@ module City = struct
              when overground = structure.overground ->
                false
            | _ -> true)
-         pc.ground
+         (get city.cells (x - 1)).ground
 
-  let can_build city structure x =
+  let is_underground_buildable structure c =
+    if structure = Structures.minerCamp then
+      List.for_all (fun wS -> wS.structure = Structures.seam) c.ground
+    else if structure = Structures.well then
+      List.length c.ground >= 1
+      && List.for_all (fun wS -> wS.structure = Structures.groundwater) c.ground
+    else if structure = Structures.derrick then
+      List.length c.ground >= 1
+      && List.for_all (fun wS -> wS.structure = Structures.oilDeposit) c.ground
+    else true
+
+  let can_build city (structure : structure) x =
     let pc = get city.cells (x - 1) in
     let c = get city.cells x in
     let nc = get city.cells (x + 1) in
     (* Partie découverte ? *)
     c.explored = Yes
+    && (structure.width < 2 || nc.explored = Yes)
     && ((* Biome constructible ? *)
         Biomes.is_flat c.biome
         && structure <> Structures.crops
@@ -1016,8 +1027,6 @@ module City = struct
        || c.biome = Biomes.ocean
           && structure = Structures.harbor
           && (pc.biome <> Biomes.ocean || nc.biome <> Biomes.ocean)
-       || c.biome = Biomes.mountain && false
-          && (pc.biome <> Biomes.mountain || nc.biome <> Biomes.mountain)
        || (c.biome = Biomes.ocean
           && structure = Structures.boat
           &&
@@ -1028,9 +1037,9 @@ module City = struct
           in
           cell_contains_harbor pc || cell_contains_harbor nc)
        || (c.biome = Biomes.mountain && structure = Structures.tunnel))
-    && (structure.width = 1
-       || (nc.biome <> Biomes.mountain && nc.biome <> Biomes.ocean))
+    && (structure.width < 2 || Biomes.is_flat nc.biome)
     && is_cell_empty city structure x
+    && is_underground_buildable structure c
 
   let can_buy city (structure, level) =
     let l = structure.levels.(level) in
