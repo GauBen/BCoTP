@@ -38,7 +38,7 @@ let () =
           Graphics.auto_synchronize false;
 
           Game.update game dt;
-          Userinterface.update ui;
+          Userinterface.update ui dt;
           Userinterface.draw ui;
 
           Graphics.synchronize ();

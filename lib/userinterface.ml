@@ -28,6 +28,7 @@ and ui = {
   scene : scene;
   hud : hud;
   mutable tick : int;
+  mutable endGameAnimation : float;
   (* Pour les animations *)
   mutable hoveredElement : uiElement;
   mutable clickedElement : uiElement;
@@ -381,7 +382,9 @@ module Draw = struct
 
   let _draw_gif scene' ui shade (gif : Resources.gif)
       ({ x; overground } : Game.coords) =
-    let bitmap = gif.frames.(ui.tick mod gif.length) in
+    let bitmap =
+      gif.frames.((ui.tick + iof ui.endGameAnimation) mod gif.length)
+    in
     let gc = Pixels.per_block ui in
     _draw_on_scene scene' ui shade bitmap
       {
@@ -1579,6 +1582,7 @@ let new_ui city =
           down = false;
         };
       tick = 0;
+      endGameAnimation = 0.;
       screen;
       clickedElement = screen.screen_element;
       hoveredElement = screen.screen_element;
@@ -1590,7 +1594,10 @@ let new_ui city =
     ui.screen.screen_element.children <- [ Elements.new_splash screen ];
   ref ui
 
-let update refUi =
+let endGameAnimationDuration =
+  (Option.get Resources.Structures.rocketStation.levels.(2).overground).length
+
+let update refUi dt =
   let ui = !refUi in
   (if
    ui.screen.screen_element.sizes.x <> sx ()
@@ -1618,8 +1625,30 @@ let update refUi =
   done;
   if ui.city.state = GameOver && List.length ui.hud.element.children > 1 then
     ui.hud.element.children <- [ Elements.new_defeat_popup ui.hud ]
-  else if ui.city.state = Won && List.length ui.hud.element.children > 1 then
-    ui.hud.element.children <- [ Elements.new_victory_popup ui.hud ];
+  else if ui.city.state = Won && List.length ui.hud.element.children > 1 then (
+    let diff = ui.tick mod endGameAnimationDuration in
+    let frames =
+      (Option.get Resources.Structures.rocketStation.levels.(2).overground)
+        .frames
+    in
+    let backup = Array.copy frames in
+    for i = 0 to endGameAnimationDuration - 1 do
+      frames.((i + diff) mod endGameAnimationDuration) <- backup.(i)
+    done;
+    ui.hud.element.children <- [];
+    ui.endGameAnimation <-
+      min (foi endGameAnimationDuration -. 0.001) (ui.endGameAnimation +. dt))
+  else if
+    ui.city.state = Won
+    && ui.endGameAnimation +. 0.002 < foi endGameAnimationDuration
+  then
+    ui.endGameAnimation <-
+      min (foi endGameAnimationDuration -. 0.001) (ui.endGameAnimation +. dt)
+  else if
+    ui.city.state = Won
+    && ui.endGameAnimation +. 0.002 >= foi endGameAnimationDuration
+    && List.length ui.hud.element.children = 0
+  then ui.hud.element.children <- [ Elements.new_victory_popup ui.hud ];
   ui.scene.scene_scale <- max 1 (min ui.scene.scene_scale 12);
   ui.scene.cameraX <- modfl ui.scene.cameraX ui.city.width;
   ui.tick <- iof ui.city.time
