@@ -1636,8 +1636,7 @@ let update refUi dt =
       frames.((i + diff) mod endGameAnimationDuration) <- backup.(i)
     done;
     ui.hud.element.children <- [];
-    ui.endGameAnimation <-
-      min (foi endGameAnimationDuration -. 0.001) (ui.endGameAnimation +. dt))
+    ui.endGameAnimation <- 0.)
   else if
     ui.city.state = Won
     && ui.endGameAnimation +. 0.002 < foi endGameAnimationDuration
