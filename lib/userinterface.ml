@@ -320,8 +320,9 @@ module Draw = struct
 
   (* Dessine une Resources.bitmap avec des effets *)
   let _draw_bitmap (fill_rect, curve, shade) bitmap { x; y } scale =
-    let ly, lx = (last bitmap, last bitmap.(0)) in
+    let ly = last bitmap in
     for i = 0 to ly do
+      let lx = last bitmap.(i) in
       for j = 0 to lx do
         let c = Resources.palette.(shade i j bitmap.(i).(j)) in
         if c <> Graphics.transp then (
@@ -583,8 +584,7 @@ module Draw = struct
           draw (Game2Resources.icon p.name) (2 * ui.hud.scale, y + y2);
           draw_padded_number ui
             (iof
-               (Game.Calculations.get_resource ui.city.availableResources
-                  p.name))
+               (Game.Calculations.get_resource ui.city.availableResources p.name))
             4
             { x = x + ((4 + Resources.Font.y) * ui.hud.scale); y = y + y2 };
           draw Resources.Font.slash
