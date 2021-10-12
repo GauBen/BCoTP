@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF8">
+		<title>BCoTP image maker</title>
+		<style>
+.error {background: #FCC}
+#colors button {width: 2em; height: 2em; border: none}
+#board {position: relative; outline: 1px solid black; cursor: crosshair; background: linear-gradient(to bottom, skyblue, white)}
+		</style>
+		<script>
+window.addEventListener('load', function(e) {
+
+	const PIXEL = 10;
+
+	let $ = document.querySelector.bind(document);
+
+	let $rows = $('#rows');
+	let $cols = $('#cols');
+	let $board = $('#board');
+	let $colors = $('#colors');
+	let $code = $('#code');
+
+	let ctx = $board.getContext('2d');
+
+	let colors = [
+		[],
+		[0, 0, 0],
+		[34, 32, 52],
+		[69, 40, 60],
+		[102, 57, 49],
+		[143, 86, 59],
+		[223, 113, 38],
+		[217, 160, 102],
+		[238, 195, 154],
+		[251, 242, 54],
+		[153, 229, 80],
+		[106, 190, 48],
+		[55, 148, 110],
+		[75, 105, 47],
+		[82, 75, 36],
+		[50, 60, 57],
+		[63, 63, 116],
+		[48, 96, 130],
+		[91, 110, 225],
+		[99, 155, 255],
+		[95, 205, 228],
+		[203, 219, 252],
+		[255, 255, 255],
+		[155, 173, 183],
+		[132, 126, 135],
+		[105, 106, 106],
+		[89, 86, 82],
+		[118, 66, 138],
+		[172, 50, 50],
+		[217, 87, 99],
+		[215, 123, 186],
+		[143, 151, 74],
+		[138, 111, 48],
+	];
+
+	let bitmap = [];
+
+	let color = 0;
+	let drawing = false;
+
+	let parseCode = function(code) {
+		try {
+			return JSON.parse(
+				code.replace(/\|/g, '')
+					.replace(/;/g, ',')
+					.replace(/,\s*]/g, ']')
+			);
+		} catch (e) {
+			return null;
+		}
+	};
+
+	let initBoard = function() {
+		if (bitmap.length <= 0) throw Error('bitmap plz');
+		$rows.value = bitmap.length;
+		$cols.value = bitmap[0].length;
+		$board.width = bitmap[0].length * PIXEL;
+		$board.height = bitmap.length * PIXEL;
+	}
+
+	let draw = function() {
+		ctx.clearRect(0, 0, $board.width, $board.height);
+		for (let y = 0; y < bitmap.length; y ++) {
+			for (let x = 0; x < bitmap[y].length; x ++) {
+				if (colors[bitmap[y][x]].length == 3) {
+					ctx.fillStyle = 'rgb(' + colors[bitmap[y][x]].join(',') + ')';
+					ctx.fillRect(x*PIXEL, y*PIXEL, PIXEL, PIXEL);
+				}
+			}
+		}
+	};
+
+	let saveAndDraw = function(b) {
+		bitmap = b;
+		initBoard();
+		draw();
+		saveCode();
+	};
+	
+	let saveCode = function() {
+		$code.value = JSON.stringify(bitmap)
+			.replace(/\[/g, '[|')
+			.replace(/\]/g, '|]')
+			.replace(/,/g, ';');
+	};
+
+	let resize = function(x, y) {
+		let output = [];
+		for (let i = 0; i < y; i ++) {
+			output.push([]);
+			for (let j = 0; j < x; j ++) {
+				output[i].push(
+					bitmap[i] !== undefined && bitmap[i][j] !== undefined ?
+					bitmap[i][j] : 0
+				);
+			}
+		}
+		return output
+	};
+
+	let resizeHandler = function(e) {
+		let x = parseInt($cols.value);
+		let y = parseInt($rows.value);
+		if (x*y) {
+			saveAndDraw(resize(x, y));
+		}
+	};
+
+	let pencilHandler = function(e) {
+		if (drawing) {
+			let x = Math.floor(e.layerX / PIXEL);
+			let y = Math.floor(e.layerY / PIXEL);
+			bitmap[y][x] = color;
+			draw();
+			saveCode();
+		}
+	};
+
+	let createButtons = function() {
+		colors.forEach(function(rgb, i) {
+			let $button = document.createElement('button');
+			$button.addEventListener('click', function(e) {
+				color = i;
+			}, false);
+			if (rgb.length == 3) {
+				$button.style.background = 'rgb(' + rgb.join(',') + ')';
+			}
+			$colors.appendChild($button);
+		});
+	};
+
+	createButtons();
+
+	$code.addEventListener('input', function(e) {
+		let bitmap = parseCode($code.value);
+		if (bitmap === null) {
+			$code.classList.add('error');
+		} else {
+			$code.classList.remove('error');
+			saveAndDraw(bitmap);
+		}
+	});
+
+	$cols.addEventListener('input', resizeHandler);
+	$rows.addEventListener('input', resizeHandler);
+
+	$board.addEventListener('mousedown', function(e) {
+		drawing = true;
+		pencilHandler(e);
+	});
+	document.body.addEventListener('mouseup', function(e) {
+		drawing = false;
+	});
+	$board.addEventListener('mousemove', pencilHandler);
+	$board.addEventListener('contextmenu', function(e) {
+		color = 0;
+		e.preventDefault();
+	});
+	
+	saveAndDraw(resize(25, 25));
+
+});
+		</script>
+	</head>
+	<body>
+		<p><input type=number id=rows min=1>&times;<input type=number id=cols min=1></p>
+		<p><canvas id=board></canvas></p>
+		<p id=colors></p>
+		<p><textarea id=code></textarea></p>
+	</body>
+</html>
