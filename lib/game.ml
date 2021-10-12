@@ -243,14 +243,14 @@ module Structures = struct
           {
             initialResources =
               [
-                { name = Resources.villagers; amount = 5. };
-                { name = Resources.water; amount = 30. };
-                { name = Resources.food; amount = 21. };
-                { name = Resources.wood; amount = 100. };
-                { name = Resources.sand; amount = 50. };
-                { name = Resources.metal; amount = 0. };
-                { name = Resources.oil; amount = 0. };
-                { name = Resources.electricity; amount = 0. };
+                { name = Resources.villagers; amount = 500. };
+                { name = Resources.water; amount = 3000. };
+                { name = Resources.food; amount = 2100. };
+                { name = Resources.wood; amount = 10000. };
+                { name = Resources.sand; amount = 5000. };
+                { name = Resources.metal; amount = 1000. };
+                { name = Resources.oil; amount = 1000. };
+                { name = Resources.electricity; amount = 1000. };
               ];
             production =
               [
@@ -259,14 +259,14 @@ module Structures = struct
               ];
             storage =
               [
-                { name = Resources.villagers; amount = 5. };
-                { name = Resources.water; amount = 50. };
-                { name = Resources.food; amount = 100. };
-                { name = Resources.wood; amount = 300. };
-                { name = Resources.sand; amount = 150. };
-                { name = Resources.metal; amount = 100. };
-                { name = Resources.oil; amount = 0. };
-                { name = Resources.electricity; amount = 0. };
+                { name = Resources.villagers; amount = 500. };
+                { name = Resources.water; amount = 5000. };
+                { name = Resources.food; amount = 10000. };
+                { name = Resources.wood; amount = 30000. };
+                { name = Resources.sand; amount = 150000. };
+                { name = Resources.metal; amount = 100000. };
+                { name = Resources.oil; amount = 10000. };
+                { name = Resources.electricity; amount = 10000. };
               ];
           };
         |];
